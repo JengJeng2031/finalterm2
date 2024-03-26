@@ -32,25 +32,18 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form action="/titles<?php if (isset($title_id)) {
-                            echo '/' . $title_id->tit_id;
-                        } ?>" method="post">
-                            <?php if (isset($title_id)) { ?>
-                            @method('PUT')
-                            <?php } ?>
+                        <form action="{{ isset($title_id) ? '/titles/' . $title_id->tit_id : '/titles' }}" method="post">
                             @csrf
+                            @if(isset($title_id))
+                                @method('PUT')
+                            @endif
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">คำนำหน้าชื่อ</label>
-                                    <input type="text" name="tit_name" value="<?php if (isset($title_id)) {
-                                        echo $title_id->tit_name;
-                                    } ?>" class="form-control"
-                                        id="exampleInputEmail1" placeholder="เช่น นาย นาง นางสาว ฯลฯ">
+                                    <input type="text" name="tit_name" value="{{ isset($title_id) ? $title_id->tit_name : old('tit_name') }}" class="form-control" id="exampleInputEmail1" placeholder="เช่น นาย นาง นางสาว ฯลฯ">
                                 </div>
                                 <div class="form-check">
-                                    <input type="checkbox" name="tit_is_active" <?php if(isset($title_id) &&
-                                                $title_id->tit_is_active == 1){?> checked
-                                        <?php }?> class="form-check-input" id="exampleCheck1">
+                                    <input type="checkbox" name="tit_is_active" {{ isset($title_id) && $title_id->tit_is_active == 1 ? 'checked' : '' }} class="form-check-input" id="exampleCheck1">
                                     <label class="form-check-label" for="exampleCheck1">ใช้งาน</label>
                                 </div>
                             </div>
@@ -83,23 +76,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach($titles as $index => $title) {?>
-                                    <tr>
-                                        <td>{{ $index + 1 }}.</td>
-                                        <td>{{ $title->tit_name }}</td>
-                                        <td>
-                                            {{ $title->tit_is_active }}
-                                    </td>
-                                     <td>
-                                         <a href="{{ url('/titles/' . $title->tit_id) }}" class="btn btn-warning">แก้ไข</a>
-                                         <form method="post" action="/titles/{{ $title->tit_id }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">ลบ</button>
-                                        </form>
-                                        </td>
-                                    </tr>
-                                    <?php } ?>
+                                    @foreach($titles as $index => $title)
+                                        <tr>
+                                            <td>{{ $index + 1 }}.</td>
+                                            <td>{{ $title->tit_name }}</td>
+                                            <td>{{ $title->tit_is_active ? 'Active' : 'Inactive' }}</td>
+                                            <td>
+                                                <a href="{{ url('/titles/' . $title->tit_id) }}" class="btn btn-warning">แก้ไข</a>
+                                                <form method="post" action="/titles/{{ $title->tit_id }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">ลบ</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
